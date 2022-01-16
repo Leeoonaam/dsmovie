@@ -1,9 +1,13 @@
 package com.leonam.dsmovie.entities;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 //shift + Ctrl + O para importar
@@ -25,6 +29,12 @@ public class Movie {
 	private Double score;
 	private Integer count;
 	private String image;
+	
+	//Annotation especial do jpa - Um para Muitos - atributo mappedBy para chaves primarias
+	@OneToMany(mappedBy = "id.movie")
+	//variavel de coleção - usa-se Set<> para não ter dado repetido
+	//HashSet no java a coleção Set é uma interface, não pode instanciar um new Set(), então instancia uma classe que implementa uma interface
+	private Set<Score> scores = new HashSet<>();
 	
 	//construtor para instanciar
 	public Movie() {
@@ -79,6 +89,14 @@ public class Movie {
 
 	public void setImage(String image) {
 		this.image = image;
+	}
+
+	public Set<Score> getScores() {
+		return scores;
+	}
+
+	public void setScores(Set<Score> scores) {
+		this.scores = scores;
 	}
 	
 	
