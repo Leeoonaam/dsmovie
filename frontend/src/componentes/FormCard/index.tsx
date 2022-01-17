@@ -1,8 +1,9 @@
-import axios from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Movie } from 'types/movie';
 import { BASE_URL } from 'utils/request';
+import { validateEmail } from 'utils/validate';
 import './style.css';
 
 type Props = {
@@ -10,6 +11,8 @@ type Props = {
 }    
 
 function FormCard({movieId} : Props) {
+
+    const navigate = useNavigate();
 
     const [movie, setMovie] = useState<Movie>();
 
@@ -20,12 +23,48 @@ function FormCard({movieId} : Props) {
         }); 
     }, [movieId]);
 
+    const handleSubmit = (event : React.FormEvent<HTMLFormElement>) => {
+
+        //impede que o formulario seja enviado, sendo assim, não atualiza a pagina
+        event.preventDefault();
+
+        //capturando elementos do form
+        const email = (event.target as any).email.value;
+        const score = (event.target as any).score.value;
+
+        //!(excalamação) significa que se não validar o email, retorna
+        if(!validateEmail(email)){
+            return;
+        }
+
+        //Objeto de configuração da requisição Axios
+        const config: AxiosRequestConfig = {
+            baseURL: BASE_URL,
+            method: 'PUT',
+            url: '/scores',
+            data: {
+                email: email,
+                movieId: movieId,
+                score: score
+            }
+        }
+
+        //requisição com a configuração - salva
+        axios(config).then(response =>{
+            //volta para listagem de filmes
+            //console.log(response.data)
+            navigate("/");
+        })
+        
+
+    }
+
     return (
         <div className="dsmovie-form-container">
             <img className="dsmovie-movie-card-image" src={movie?.image} alt={movie?.title} />
             <div className="dsmovie-card-bottom-container">
                 <h3>{movie?.title}</h3>
-                <form className="dsmovie-form">
+                <form className="dsmovie-form" onSubmit={handleSubmit}>
                     <div className="form-group dsmovie-form-group">
                         <label htmlFor="email">Informe seu email</label>
                         <input type="email" className="form-control" id="email" />
